@@ -7,7 +7,8 @@ const users = {};
 const data = fs.readFileSync(path.join(__dirname, 'systemUserDB.csv'), 'utf8').trim().split('\n');
 console.log('CSV data loaded:', data);
 for (let i = 1; i < data.length; i++) {
-  const [username, password, role] = data[i].split(',');
+  const line = data[i].replace(/\r/g, ''); // Remove carriage returns
+  const [username, password, role] = line.split(',');
   users[username] = { password, role };
 }
 console.log('Users loaded:', users);
@@ -38,7 +39,17 @@ const server = http.createServer((req, res) => {
       res.writeHead(200, { 'Content-Type': 'text/html' });
       res.end(content);
     });
-  } else if (req.method === 'POST' && req.url === '/login') {
+  } else if (req.method === 'GET' && req.url === '/test') {
+    fs.readFile(path.join(__dirname, 'test-login.html'), (err, content) => {
+      if (err) {
+        res.writeHead(500);
+        res.end('Server error');
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.end(content);
+    });
+  } else if (req.method === 'POST' && (req.url === '/login' || req.url === '/login/')) {
     console.log('Processing login request');
     let body = '';
     req.on('data', chunk => { 
@@ -71,19 +82,11 @@ const server = http.createServer((req, res) => {
   } else {
     console.log('Unmatched route:', req.method, req.url);
     console.log('Request headers:', req.headers);
-    
-    // Check if it's a login-related request that didn't match
-    if (req.url.includes('login')) {
-      console.log('Login-related request detected but not matched');
-      if (req.method !== 'POST') {
-        res.writeHead(405, { 'Content-Type': 'text/html' });
-        res.end('<h1>405 - Method Not Allowed</h1><p>Login requires POST method</p>');
-        return;
-      }
-    }
+    console.log('URL exact match check:', JSON.stringify(req.url));
+    console.log('URL length:', req.url.length);
     
     res.writeHead(404, { 'Content-Type': 'text/html' });
-    res.end(`<h1>404 - Page Not Found</h1><p>Requested: ${req.method} ${req.url}</p>`);
+    res.end(`<h1>404 - Page Not Found</h1><p>Requested: ${req.method} ${req.url}</p><p>URL bytes: ${JSON.stringify(req.url)}</p>`);
   }
 });
 

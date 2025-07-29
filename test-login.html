@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login Test</title>
+</head>
+<body>
+  <h1>Login Test</h1>
+  
+  <h2>Test 1: Basic Form</h2>
+  <form action="/login" method="POST" enctype="application/x-www-form-urlencoded">
+    <label>Username: <input type="text" name="username" value="Teacher1" required></label><br><br>
+    <label>Password: <input type="password" name="password" value="RCSS" required></label><br><br>
+    <button type="submit">Login (POST)</button>
+  </form>
+  
+  <h2>Test 2: Manual AJAX Test</h2>
+  <button onclick="testLogin()">Test Login via JavaScript</button>
+  <div id="result"></div>
+  
+  <h2>Test 3: Curl Command</h2>
+  <p>Try this in terminal:</p>
+  <code>curl -X POST http://localhost:3000/login -d "username=Teacher1&password=RCSS" -H "Content-Type: application/x-www-form-urlencoded"</code>
+  
+  <script>
+    function testLogin() {
+      console.log('Testing login via JavaScript...');
+      
+      const formData = new FormData();
+      formData.append('username', 'Teacher1');
+      formData.append('password', 'RCSS');
+      
+      // Convert FormData to URL-encoded string
+      const urlEncodedData = new URLSearchParams();
+      urlEncodedData.append('username', 'Teacher1');
+      urlEncodedData.append('password', 'RCSS');
+      
+      fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: urlEncodedData
+      })
+      .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        return response.text();
+      })
+      .then(data => {
+        console.log('Response data:', data);
+        document.getElementById('result').innerHTML = data;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('result').innerHTML = 'Error: ' + error.message;
+      });
+    }
+    
+    // Add debugging for the main form
+    document.querySelector('form').addEventListener('submit', function(e) {
+      console.log('Form submitted');
+      console.log('Action:', this.action);
+      console.log('Method:', this.method);
+      console.log('Enctype:', this.enctype);
+      
+      // Log form data
+      const formData = new FormData(this);
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
+    });
+  </script>
+</body>
+</html>
