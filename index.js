@@ -11,6 +11,7 @@ for (let i = 1; i < data.length; i++) {
 }
 
 const server = http.createServer((req, res) => {
+  console.log(`Incoming ${req.method} ${req.url}`);
   if (req.method === 'GET' && req.url === '/') {
     fs.readFile(path.join(__dirname, 'index.html'), (err, content) => {
       if (err) {
