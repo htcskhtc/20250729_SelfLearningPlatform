@@ -5,10 +5,19 @@
 </head>
 <body>
   <h1>Login</h1>
-  <form action="/login" method="post">
-    <label>Username: <input type="text" name="username" required></label><br>
-    <label>Password: <input type="password" name="password" required></label><br>
+  <form action="/login" method="POST" enctype="application/x-www-form-urlencoded">
+    <label>Username: <input type="text" name="username" required></label><br><br>
+    <label>Password: <input type="password" name="password" required></label><br><br>
     <button type="submit">Login</button>
   </form>
+  
+  <script>
+    // Add some debugging
+    document.querySelector('form').addEventListener('submit', function(e) {
+      console.log('Form submitted');
+      console.log('Action:', this.action);
+      console.log('Method:', this.method);
+    });
+  </script>
 </body>
 </html>
